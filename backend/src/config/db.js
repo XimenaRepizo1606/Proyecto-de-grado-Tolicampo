@@ -18,6 +18,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   charset: 'utf8mb4',
   decimalNumbers: true,
+  dateStrings: ['DATE'], // las fechas tipo DATE llegan como '2026-10-16', sin zona horaria
 });
 
 module.exports = pool;

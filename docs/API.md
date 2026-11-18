@@ -50,13 +50,45 @@ Respuesta `200`: `{ "token": "...", "usuario": { ... } }`. Si los datos son inco
 
 | Estado | Método | Ruta | Quién | Para qué |
 |---|---|---|---|---|
-| ⏳ | GET | `/productos?categoria=&q=&min=&max=&municipio=&pagina=` | Todos | Catálogo con filtros y buscador (RF06) |
-| ⏳ | GET | `/productos/ofertas` | Todos | Ofertas de la semana |
-| ⏳ | GET | `/productos/:id` | Todos | Detalle con finca, municipio y verificado (RF07) |
-| ⏳ | GET | `/productos/mios` 🔒 | Productor | Sus publicaciones |
-| ⏳ | POST | `/productos` 🔒 | Productor | Publicar producto con foto (RF04) |
-| ⏳ | PUT | `/productos/:id` 🔒 | Productor dueño | Editar producto (RF05) |
-| ⏳ | PATCH | `/productos/:id/estado` 🔒 | Productor dueño | `{ "estado": "activo" \| "pausado" \| "agotado" }` (RF05) |
+| ✅ | GET | `/productos?categoria=&q=&min=&max=&municipio=&pagina=&limite=` | Todos | Catálogo con filtros y buscador (RF06) |
+| ✅ | GET | `/productos/ofertas` | Todos | Ofertas de la semana |
+| ✅ | GET | `/productos/:id` | Todos | Detalle con finca, municipio y verificado (RF07) |
+| ✅ | GET | `/productos/mios` 🔒 | Productor | Sus publicaciones |
+| ✅ | POST | `/productos` 🔒 | Productor | Publicar producto con foto (RF04) |
+| ✅ | PUT | `/productos/:id` 🔒 | Productor dueño | Editar producto (RF05) |
+| ✅ | PATCH | `/productos/:id/estado` 🔒 | Productor dueño | `{ "estado": "activo" \| "pausado" \| "agotado" }` (RF05) |
+
+### Ejemplos del Sprint 3
+
+**Catálogo** – `GET /productos?categoria=Frutas&q=fresa&max=8000`
+- `categoria`: id (`4`) o nombre exacto (`Frutas`).
+- `q`: busca en el nombre del producto, la finca y el municipio.
+- `min` y `max`: rango del precio final, ya con descuento.
+- `pagina` y `limite`: paginación (24 por página; máximo 100).
+
+Respuesta: `{ "total": 13, "pagina": 1, "limite": 24, "productos": [ ... ] }`. Cada producto trae:
+```json
+{ "id_producto": 1, "nombre": "Tomate chonto", "categoria": "Verduras",
+  "precio_unitario": 4800, "descuento_pct": 15, "precio_final": 4080, "precio_libra": 2040,
+  "unidad": "kilo", "cantidad_disponible": 50, "foto_url": null, "estado": "activo",
+  "id_productor": 1, "nombre_finca": "La Esperanza", "verificado": 1, "municipio": "Ibagué",
+  "precio_referencia_kg": 3500, "fecha_referencia": "2026-10-16" }
+```
+Las fotos se muestran con la dirección de la API + `foto_url`, por ejemplo `https://<api>/uploads/abc.jpg`. Si `foto_url` es `null`, el frontend muestra una imagen por defecto.
+
+**Publicar producto** – `POST /productos` 🔒 (productor). Se envía como **multipart/form-data** (`FormData` en React):
+`nombre`, `id_categoria`, `precio_unitario`, `cantidad_disponible`, `unidad` (opcional: `kilo` por defecto), `descuento_pct` (opcional) y `foto` (opcional: JPG, PNG o WEBP de máximo 2 MB).
+```js
+const datos = new FormData();
+datos.append('nombre', 'Mazorca'); datos.append('id_categoria', 3);
+datos.append('precio_unitario', 3600); datos.append('cantidad_disponible', 40);
+datos.append('foto', archivo);
+fetch(`${API}/productos`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: datos });
+```
+
+**Editar** – `PUT /productos/:id` 🔒: se envían solo los campos que cambian (JSON o FormData si cambia la foto).
+
+**Pausar, activar o marcar agotado** – `PATCH /productos/:id/estado` 🔒 con `{ "estado": "pausado" }`. Un producto pausado u oculto no aparece en el catálogo; el productor lo sigue viendo en `/productos/mios`.
 
 ## Sprint 4 – Contacto, carrito, precios y administración (RF08 a RF13)
 

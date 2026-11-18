@@ -19,6 +19,9 @@ function manejadorErrores(err, req, res, next) {
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ error: 'El cuerpo de la petición no es un JSON válido' });
   }
+  if (err.name === 'MulterError') {
+    return res.status(400).json({ error: 'No se pudo recibir la foto. Envíe una sola imagen en el campo "foto"' });
+  }
   if (err.code === 'ER_DUP_ENTRY') {
     return res.status(409).json({ error: 'Ya existe un registro con esos datos' });
   }
