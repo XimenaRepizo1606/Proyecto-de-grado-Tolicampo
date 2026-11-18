@@ -5,7 +5,7 @@ Base local: `http://localhost:4000/api` · Base publicada: `https://<api-en-rail
 Todas las respuestas son JSON. Los errores tienen la forma `{ "error": "mensaje" }`.
 Las rutas marcadas con 🔒 necesitan la cabecera `Authorization: Bearer <token>`, que se recibe al registrarse o iniciar sesión.
 
-**Estado:** ✅ implementada y probada · ⏳ pendiente
+**Estado:** ✅ implementada y probada
 
 ## Sprint 2 – Autenticación y perfil del productor (RF01, RF02, RF03)
 
@@ -94,21 +94,51 @@ fetch(`${API}/productos`, { method: 'POST', headers: { Authorization: `Bearer ${
 
 | Estado | Método | Ruta | Quién | Para qué |
 |---|---|---|---|---|
-| ⏳ | POST | `/solicitudes` 🔒 | Comprador | Crear solicitud; devuelve el enlace de WhatsApp (RF08) |
-| ⏳ | GET | `/solicitudes/recibidas` 🔒 | Productor | Solicitudes de sus productos (RF09) |
-| ⏳ | GET | `/solicitudes/enviadas` 🔒 | Comprador | Solicitudes que ha hecho |
-| ⏳ | PATCH | `/solicitudes/:id/estado` 🔒 | Productor | `pendiente`, `atendida` o `cerrada` (RF09) |
-| ⏳ | GET | `/carrito` 🔒 | Comprador | Carrito abierto con total |
-| ⏳ | POST | `/carrito/items` 🔒 | Comprador | `{ "id_producto", "cantidad", "unidad" }` |
-| ⏳ | PATCH | `/carrito/items/:id` 🔒 | Comprador | Cambiar cantidad |
-| ⏳ | DELETE | `/carrito/items/:id` 🔒 | Comprador | Quitar producto |
-| ⏳ | POST | `/carrito/enviar` 🔒 | Comprador | Cierra el pedido y devuelve un enlace de WhatsApp por productor |
-| ⏳ | GET | `/precios` | Todos | Precios de referencia SIPSA (RF10) |
-| ⏳ | POST | `/precios/csv` 🔒 | Admin | Cargar precios desde un CSV (RF12) |
-| ⏳ | GET | `/admin/productores?verificado=0` 🔒 | Admin | Productores por verificar (RF11) |
-| ⏳ | PATCH | `/admin/productores/:id/verificar` 🔒 | Admin | Marcar como verificado (RF11) |
-| ⏳ | PATCH | `/admin/productos/:id/moderar` 🔒 | Admin | Ocultar o mostrar una publicación (RF11) |
-| ⏳ | GET | `/admin/reportes` 🔒 | Admin | Totales de usuarios, productos y solicitudes (RF13) |
+| ✅ | POST | `/solicitudes` 🔒 | Comprador | Crear solicitud; devuelve el enlace de WhatsApp (RF08) |
+| ✅ | GET | `/solicitudes/recibidas` 🔒 | Productor | Solicitudes de sus productos (RF09) |
+| ✅ | GET | `/solicitudes/enviadas` 🔒 | Comprador | Solicitudes que ha hecho |
+| ✅ | PATCH | `/solicitudes/:id/estado` 🔒 | Productor | `pendiente`, `atendida` o `cerrada` (RF09) |
+| ✅ | GET | `/carrito` 🔒 | Comprador | Carrito abierto con total |
+| ✅ | POST | `/carrito/items` 🔒 | Comprador | `{ "id_producto", "cantidad", "unidad" }` |
+| ✅ | PATCH | `/carrito/items/:id` 🔒 | Comprador | Cambiar cantidad |
+| ✅ | DELETE | `/carrito/items/:id` 🔒 | Comprador | Quitar producto |
+| ✅ | DELETE | `/carrito` 🔒 | Comprador | Vaciar el carrito |
+| ✅ | POST | `/carrito/enviar` 🔒 | Comprador | Cierra el pedido y devuelve un enlace de WhatsApp por productor |
+| ✅ | GET | `/precios` | Todos | Precios de referencia SIPSA (RF10) |
+| ✅ | POST | `/precios/csv` 🔒 | Admin | Cargar precios desde un CSV (RF12) |
+| ✅ | GET | `/admin/productores?verificado=0` 🔒 | Admin | Productores por verificar (RF11) |
+| ✅ | PATCH | `/admin/productores/:id/verificar` 🔒 | Admin | Marcar como verificado (RF11) |
+| ✅ | PATCH | `/admin/productos/:id/moderar` 🔒 | Admin | Ocultar o mostrar una publicación (RF11) |
+| ✅ | GET | `/admin/reportes` 🔒 | Admin | Totales de usuarios, productos y solicitudes (RF13) |
+
+### Ejemplos del Sprint 4
+
+**Contactar al productor** – `POST /solicitudes` 🔒 (comprador)
+```json
+{ "id_producto": 1, "cantidad": 3, "mensaje": "¿Me lo envía el sábado?" }
+```
+Respuesta `201`: `{ "mensaje": "Solicitud enviada al productor", "id_solicitud": 4, "enlace_whatsapp": "https://wa.me/573000000001?text=..." }`. El frontend abre ese enlace con `window.open(enlace, '_blank')`.
+
+**Carrito** – `POST /carrito/items` 🔒 con `{ "id_producto": 1, "cantidad": 2, "unidad": "libra" }`. Un producto que se vende por kilo también se puede pedir por libra, a la mitad del precio. Si se agrega el mismo producto con la misma unidad, la cantidad se suma.
+Todas las rutas del carrito responden con el carrito completo:
+```json
+{ "id_pedido": 1, "total": 15480, "cantidad_items": 4,
+  "items": [ { "id_detalle": 3, "id_producto": 1, "nombre": "Tomate chonto", "cantidad": 2, "unidad": "libra",
+               "precio_unitario": 2040, "subtotal": 4080, "nombre_finca": "La Esperanza", "foto_url": null } ] }
+```
+
+**Enviar pedido** – `POST /carrito/enviar` 🔒. Cierra el pedido, crea una solicitud por producto para el productor y devuelve **un enlace de WhatsApp por cada productor**, porque cada uno acuerda su pago y su entrega:
+```json
+{ "mensaje": "Pedido enviado. Coordine el pago y la entrega con cada productor.", "id_pedido": 1, "total": 25120,
+  "enlaces": [ { "id_productor": 1, "finca": "La Esperanza", "total": 6120, "enlace_whatsapp": "https://wa.me/57..." } ] }
+```
+
+**Cargar precios** – `POST /precios/csv` 🔒 (admin), multipart con el archivo en el campo `archivo`. Columnas: `producto,categoria,valor_kg,fecha` y, de forma opcional, `fuente`. Se acepta coma o punto y coma como separador, y la fecha va en formato `AAAA-MM-DD`. Hay un ejemplo en `docs/precios_ejemplo.csv`. Si alguna fila tiene errores no se carga nada, y la respuesta indica la línea y el problema.
+
+**Administración** – todas las rutas `/admin/...` son solo para el administrador:
+- `PATCH /admin/productores/:id/verificar` con `{ "verificado": true }` o `false`.
+- `PATCH /admin/productos/:id/moderar` con `{ "oculto": true }` o `false`. Una publicación oculta no aparece en el catálogo y el productor no la puede reactivar.
+- `GET /admin/reportes` devuelve los usuarios por rol, los productores verificados y pendientes, los productos por estado, las solicitudes por estado, los pedidos enviados con su valor total y los productos activos por categoría.
 
 ## Usuarios de prueba (datos del script de la base de datos)
 
