@@ -1,0 +1,458 @@
+{
+  "info": {
+    "name": "ToliCampo API – Sprint 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:4000/api"
+    },
+    {
+      "key": "tokenProductor",
+      "value": ""
+    },
+    {
+      "key": "tokenComprador",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Salud de la API",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/salud",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "salud"
+          ]
+        },
+        "description": ""
+      }
+    },
+    {
+      "name": "Categorías",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/categorias",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "categorias"
+          ]
+        },
+        "description": ""
+      }
+    },
+    {
+      "name": "Veredas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/veredas",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "veredas"
+          ]
+        },
+        "description": ""
+      }
+    },
+    {
+      "name": "Login productor (guarda token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/login",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"productor1@ejemplo.test\",\n  \"contrasena\": \"Prueba2026*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const j = pm.response.json(); if (j.token) pm.collectionVariables.set('tokenProductor', j.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login comprador (guarda token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/login",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"comprador1@ejemplo.test\",\n  \"contrasena\": \"Prueba2026*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const j = pm.response.json(); if (j.token) pm.collectionVariables.set('tokenComprador', j.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login con clave incorrecta (debe dar 401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/login",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"productor1@ejemplo.test\",\n  \"contrasena\": \"incorrecta\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Registro comprador",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/registro",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "registro"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Laura Gómez\",\n  \"correo\": \"laura.prueba@correo.com\",\n  \"contrasena\": \"Clave2026\",\n  \"rol\": \"comprador\",\n  \"acepta_tratamiento_datos\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Registro productor",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/registro",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "registro"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"José Rojas\",\n  \"telefono\": \"3109998877\",\n  \"contrasena\": \"Clave2026\",\n  \"rol\": \"productor\",\n  \"acepta_tratamiento_datos\": true,\n  \"nombre_finca\": \"El Mirador\",\n  \"id_vereda\": 1,\n  \"cultivos\": \"Café, plátano\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Registro sin autorizar datos (debe dar 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/registro",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "registro"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Sin autorización\",\n  \"correo\": \"sin@correo.com\",\n  \"contrasena\": \"Clave2026\",\n  \"rol\": \"comprador\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Inyección SQL en login (debe dar 401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/login",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"' OR '1'='1\",\n  \"contrasena\": \"x\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Mi usuario",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/auth/yo",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "auth",
+            "yo"
+          ]
+        },
+        "description": "",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenProductor}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Mi perfil de productor",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/productores/mi-perfil",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "productores",
+            "mi-perfil"
+          ]
+        },
+        "description": "",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenProductor}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Editar mi perfil",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/productores/mi-perfil",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "productores",
+            "mi-perfil"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"descripcion\": \"Tomates cultivados sin químicos\"\n}"
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenProductor}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Comprador intenta ver perfil de productor (debe dar 403)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/productores/mi-perfil",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "productores",
+            "mi-perfil"
+          ]
+        },
+        "description": "",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenComprador}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Perfil público del productor 2",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base}}/productores/2",
+          "host": [
+            "{{base}}"
+          ],
+          "path": [
+            "productores",
+            "2"
+          ]
+        },
+        "description": ""
+      }
+    }
+  ]
+}
