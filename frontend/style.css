@@ -24,6 +24,7 @@ button{font:inherit;cursor:pointer}
 .topbar{position:sticky;top:0;z-index:50;background:var(--blanco);border-bottom:3px solid var(--naranja)}
 .barra{display:flex;align-items:center;gap:.8rem;padding:.6rem 0;flex-wrap:wrap}
 .logo{font-weight:700;font-size:1.8rem;color:var(--verde-osc);display:flex;align-items:center;gap:.4rem}
+.logo img{height:52px;width:auto}
 .menu{display:flex;gap:.2rem;margin-left:auto}
 .menu a,.desp-btn{display:block;background:none;border:0;color:var(--naranja);font-weight:700;font-size:1.2rem;padding:.4rem .9rem}
 .menu a:hover,.menu a.activo,.desp-btn:hover,.desplegable.abierto .desp-btn{background:var(--naranja);color:var(--blanco)}
