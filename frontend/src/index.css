@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos compartidos, equivalentes a las clases del prototipo HTML (style.css) */
+@layer base {
+  body { @apply font-sans text-[1.05rem] leading-relaxed text-texto bg-white; }
+  h1, h2, h3 { @apply font-titulo font-bold; }
+  :focus-visible { outline: 3px solid #f26a1b; outline-offset: 2px; }
+}
+
+@layer components {
+  .contenedor { @apply mx-auto w-[92%] max-w-[1160px]; }
+  .btn { @apply inline-flex items-center justify-center gap-2 border-2 border-naranja bg-naranja px-5 py-2 font-titulo text-lg font-bold text-white transition-colors hover:border-naranja-osc hover:bg-naranja-osc disabled:cursor-not-allowed disabled:opacity-60; }
+  .btn-claro { @apply border-verde-osc bg-transparent text-verde-osc hover:border-verde-osc hover:bg-verde-osc hover:text-white; }
+  .btn-peq { @apply px-3 py-1 text-base; }
+  .titulo-seccion { @apply mb-6 border-l-8 border-naranja pl-3 text-3xl text-verde-osc md:text-4xl; }
+  .campo { @apply grid gap-1 text-[.95rem] font-semibold; }
+  .campo input, .campo select, .campo textarea { @apply w-full border-2 border-verde-cla/70 bg-white px-3 py-2 font-sans font-normal text-texto focus:border-naranja focus:outline-none; }
+  .tarjeta { @apply flex flex-col border-2 border-verde-fondo bg-white transition-colors hover:border-naranja; }
+  .tabla { @apply w-full border-collapse text-[.95rem]; }
+  .tabla th { @apply bg-verde-fondo p-2 text-left text-verde-osc; }
+  .tabla td { @apply border-b border-verde-fondo p-2 align-middle; }
+  .chip { @apply inline-block px-2 py-0.5 text-xs font-bold uppercase tracking-wide; }
+}
