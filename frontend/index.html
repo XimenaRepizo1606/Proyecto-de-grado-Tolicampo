@@ -12,7 +12,7 @@
 
 <header class="topbar">
   <div class="barra container">
-    <a href="#inicio" class="logo"><img src="imagenes/logo-tolicampo.svg" alt="logo-tolicampo">ToliCampo</a>
+    <a href="#inicio" class="logo"><img src="imagenes/vegetables.png" alt="logo-tolicampo">ToliCampo</a>
     <button class="burger" id="burger" aria-label="Abrir menú">☰</button>
     <nav class="menu" id="menu" aria-label="Principal">
       <a href="#inicio">Inicio</a>
@@ -160,6 +160,7 @@
     <div class="pestanas">
       <button type="button" class="on" data-tab="cliente">Soy cliente</button>
       <button type="button" data-tab="proveedor">Soy campesino o proveedor</button>
+      <button type="button" data-tab="login">Ya tengo cuenta</button>
     </div>
     <form class="formulario" id="f-cliente">
       <label>Nombre completo<input name="nombre" required></label>
@@ -169,6 +170,7 @@
       </div>
       <label>Dirección de entrega<input name="direccion" required></label>
       <label>Contraseña<input type="password" name="clave" minlength="6" required></label>
+      <label style="display:flex;align-items:center;gap:.5rem;font-weight:400"><input type="checkbox" name="acepta" required style="width:auto;padding:0"> Acepto el tratamiento de mis datos personales (Ley 1581 de 2012)</label>
       <button class="btn" type="submit">Crear cuenta de cliente</button>
     </form>
     <form class="formulario" id="f-proveedor" hidden>
@@ -177,7 +179,7 @@
         <label>Nombre de la finca<input name="finca" required></label>
       </div>
       <div class="fila">
-        <label>Municipio<select name="municipio" id="p-mun" required></select></label>
+        <label>Vereda (municipio)<select name="municipio" id="p-mun" required></select></label>
         <label>Celular<input type="tel" name="telefono" required></label>
       </div>
       <label>Productos que cultivas o produces<input name="productos" placeholder="Ej.: tomate, café, queso" required></label>
@@ -185,12 +187,19 @@
         <label>Correo<input type="email" name="correo" required></label>
         <label>Contraseña<input type="password" name="clave" minlength="6" required></label>
       </div>
+      <label style="display:flex;align-items:center;gap:.5rem;font-weight:400"><input type="checkbox" name="acepta" required style="width:auto;padding:0"> Acepto el tratamiento de mis datos personales (Ley 1581 de 2012)</label>
       <button class="btn" type="submit">Registrar mi finca</button>
+    </form>
+    <form class="formulario" id="f-login" hidden>
+      <label>Correo o celular<input name="usuario" required></label>
+      <label>Contraseña<input type="password" name="clave" required></label>
+      <button class="btn" type="submit">Iniciar sesión</button>
     </form>
   </div>
 </div>
 
 <div class="aviso" id="aviso" role="status"></div>
+<script src="https://checkout.epayco.co/checkout.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

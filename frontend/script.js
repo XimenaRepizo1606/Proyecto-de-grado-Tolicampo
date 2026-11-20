@@ -15,7 +15,7 @@ const p = (id, cat, n, finca, mun, kilo, img, pos = 'center', zoom = 'cover', of
   ({ id, cat, n, finca, mun, kilo, img, pos, zoom, off });
 const Z = '380%'; // recorte ampliado de las imágenes de mezcla
 
-const PRODUCTOS = [
+let PRODUCTOS = [
   // Verduras
   p('v1','verduras','Tomate chonto','Finca La Esperanza','Ibagué',4800,'tomate.jpg','center','cover',15),
   p('v2','verduras','Cebolla roja','Finca El Mirador','Cajamarca',3900,'cebolla_roja.jpg'),
@@ -88,8 +88,67 @@ const precioUnidad = (prod, u) => {
   return u === 'lb' ? Math.round(kilo / 2) : Math.round(kilo);
 };
 const foto = (prod, extra = '') =>
-  `<div class="foto" role="img" aria-label="${prod.n}" style="background-image:url('${IMG}${prod.img}');background-size:${prod.zoom};background-position:${prod.pos}">${extra}</div>`;
+  `<div class="foto" role="img" aria-label="${prod.n}" style="background-image:url('${srcImg(prod.img)}');background-size:${prod.zoom};background-position:${prod.pos}">${extra}</div>`;
 const estrellas = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+const srcImg = i => /^https?:/.test(i) ? i : IMG + i;
+
+/* ===== CONEXIÓN CON EL BACKEND (Railway) ===== */
+const API = 'https://proyecto-de-grado-tolicampo-production.up.railway.app/api';
+const API_RAIZ = API.replace(/\/api$/, '');
+async function llamarAPI(ruta, opciones = {}) {
+  const cab = { ...(opciones.headers || {}) };
+  if (opciones.body) cab['Content-Type'] = 'application/json';
+  try { const t = localStorage.getItem('token-tolima'); if (t) cab.Authorization = 'Bearer ' + t; } catch (e) {}
+  const r = await fetch(API + ruta, { ...opciones, headers: cab });
+  const datos = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(datos.error || 'Error ' + r.status);
+  return datos;
+}
+
+// Convierte el nombre de categoría de la base de datos en la clave que usa esta página.
+function slugCategoria(nombre) {
+  const n = norm(nombre || '');
+  if (!n) return undefined;
+  return Object.keys(CATEGORIAS).find(k => {
+    const t = norm(CATEGORIAS[k].t);
+    return t === n || t.startsWith(n) || n.startsWith(t);
+  });
+}
+// Convierte un producto de la API al formato que ya usan las tarjetas y el carrito.
+function productoDeAPI(x) {
+  const cat = slugCategoria(x.categoria);
+  if (!cat) return null;
+  const c = CATEGORIAS[cat];
+  const foto = x.foto_url ? (/^https?:/.test(x.foto_url) ? x.foto_url : API_RAIZ + x.foto_url) : null;
+  return {
+    id: String(x.id_producto), cat, n: x.nombre,
+    finca: x.nombre_finca || '', mun: x.municipio || '',
+    kilo: Number(x.precio_unitario),
+    img: foto || c.img[0],
+    pos: foto ? 'center' : (c.img[2] || 'center'),
+    zoom: foto ? 'cover' : (c.img[1] === '#' ? '380%' : 'cover'),
+    off: Number(x.descuento_pct) || 0
+  };
+}
+async function cargarProductos() {
+  try {
+    const d = await llamarAPI('/productos?limite=100');
+    const lista = (d.productos || []).map(productoDeAPI).filter(Boolean);
+    if (!lista.length) return;
+    PRODUCTOS = lista;
+    carrito = carrito.filter(c => buscar(c.id)); // quita del carrito lo que ya no existe
+    pintarInicio(); pintarCarrito(); ruta();
+  } catch (e) { console.warn('No se pudo cargar el catálogo desde la API; se usa el catálogo local.', e); }
+}
+async function cargarVeredas() {
+  try {
+    const v = await llamarAPI('/veredas');
+    const lista = Array.isArray(v) ? v : (v.veredas || []);
+    if (!lista.length) return;
+    $('#p-mun').innerHTML = '<option value="">Selecciona…</option>' + lista.map(x =>
+      `<option value="${x.id_vereda ?? x.id}">${x.nombre ?? x.vereda} (${x.municipio})</option>`).join('');
+  } catch (e) { console.warn('No se pudieron cargar las veredas.', e); }
+}
 
 /* ===== TARJETAS ===== */
 function tarjeta(prod) {
@@ -190,7 +249,7 @@ function pintarCarrito() {
     const prod = buscar(c.id);
     const pu = precioUnidad(prod, c.u);
     return `<tr>
-      <td><div class="mini" style="background-image:url('${IMG}${prod.img}');background-size:${prod.zoom};background-position:${prod.pos}"></div></td>
+      <td><div class="mini" style="background-image:url('${srcImg(prod.img)}');background-size:${prod.zoom};background-position:${prod.pos}"></div></td>
       <td>${prod.n}<br><small>${peso(pu)} / ${c.u === 'lb' ? 'libra' : 'kilo'}</small></td>
       <td><div class="cant"><button data-menos="${i}" aria-label="Quitar uno">−</button>${c.q}<button data-mas="${i}" aria-label="Agregar uno">+</button></div></td>
       <td>${peso(pu * c.q)}</td>
@@ -202,11 +261,11 @@ function pintarCarrito() {
   $('#carrito-vacio').hidden = carrito.length > 0;
   $('#lista-carrito').hidden = carrito.length === 0;
 }
-function aviso(txt) {
+function aviso(txt, ms = 2200) {
   const a = $('#aviso');
   a.textContent = txt;
   a.classList.add('ver');
-  setTimeout(() => a.classList.remove('ver'), 2200);
+  setTimeout(() => a.classList.remove('ver'), ms);
 }
 
 /* ===== EVENTOS ===== */
@@ -225,11 +284,51 @@ document.addEventListener('click', e => {
   else if (!dentro && !t.dataset.agregar) $('#carrito').hidden = true;
 });
 $('#vaciar-carrito').onclick = () => { carrito = []; pintarCarrito(); };
+/* ===== PAGO CON PSE (pasarela ePayco) ===== */
+const EPAYCO_LLAVE = 'PEGA_AQUI_TU_LLAVE_PUBLICA_DE_EPAYCO'; // P_KEY o llave pública del panel de ePayco
+const EPAYCO_PRUEBAS = true; // true = pagos de prueba; cambiar a false cuando todo funcione
+
 $('#pagar').onclick = () => {
   if (!carrito.length) return aviso('Tu carrito está vacío');
-  carrito = []; pintarCarrito(); $('#carrito').hidden = true;
-  aviso('¡Gracias por tu compra! Te contactaremos para coordinar la entrega.');
+  if (typeof ePayco === 'undefined') return aviso('No se pudo cargar el sistema de pagos. Revisa tu conexión e intenta de nuevo.');
+  const total = carrito.reduce((s, c) => s + precioUnidad(buscar(c.id), c.u) * c.q, 0);
+  const handler = ePayco.checkout.configure({ key: EPAYCO_LLAVE, test: EPAYCO_PRUEBAS });
+  handler.open({
+    name: 'Pedido ToliCampo',
+    description: carrito.map(c => buscar(c.id).n + ' x' + c.q).join(', ').slice(0, 250),
+    invoice: 'TC-' + Date.now(),
+    currency: 'cop',
+    amount: String(total),
+    tax_base: String(total),
+    tax: '0',
+    country: 'co',
+    lang: 'es',
+    external: 'false',
+    methodsDisable: ['TDC', 'SP', 'CASH', 'DP'], // deja solo PSE
+    response: location.origin + location.pathname
+  });
 };
+
+// Al volver del banco, ePayco regresa a la página con ?ref_payco=... y aquí se confirma el resultado.
+function revisarPago() {
+  const ref = new URLSearchParams(location.search).get('ref_payco');
+  if (!ref) return;
+  history.replaceState(null, '', location.pathname + location.hash);
+  fetch('https://secure.epayco.co/validation/v1/reference/' + encodeURIComponent(ref))
+    .then(r => r.json())
+    .then(r => {
+      const cod = Number(r && r.data && r.data.x_cod_response);
+      if (cod === 1) {
+        carrito = []; pintarCarrito();
+        aviso('¡Pago aprobado! Gracias por tu compra, te contactaremos para coordinar la entrega.');
+      } else if (cod === 3) {
+        aviso('Tu pago está pendiente de confirmación del banco.');
+      } else {
+        aviso('El pago no se completó. Tu carrito sigue guardado.');
+      }
+    })
+    .catch(() => aviso('No pudimos confirmar tu pago. Revisa el estado con tu banco.'));
+}
 $('#burger').onclick = () => $('#menu').classList.toggle('abierto');
 /* ===== MENÚ DESPLEGABLE DE CATEGORÍAS ===== */
 function pintarMenu() {
@@ -288,37 +387,88 @@ function cambiarTab(t) {
   document.querySelectorAll('.pestanas button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   $('#f-cliente').hidden = t !== 'cliente';
   $('#f-proveedor').hidden = t !== 'proveedor';
+  $('#f-login').hidden = t !== 'login';
 }
 function abrirModal() { $('#modal').hidden = false; document.body.style.overflow = 'hidden'; }
 function cerrarModal() { $('#modal').hidden = true; document.body.style.overflow = ''; }
-$('#btn-registro').onclick = abrirModal;
+$('#btn-registro').onclick = () => {
+  let activa = null;
+  try { activa = localStorage.getItem('token-tolima'); } catch (e) {}
+  if (activa) { if (confirm('¿Quieres cerrar tu sesión?')) cerrarSesion(); } else abrirModal();
+};
 $('#cerrar-modal').onclick = cerrarModal;
 $('#modal').onclick = e => { if (e.target.id === 'modal') cerrarModal(); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
 document.querySelector('.pestanas').onclick = e => e.target.dataset.tab && cambiarTab(e.target.dataset.tab);
 
-function enviarRegistro(form, clave, mensaje) {
-  form.onsubmit = e => {
+function iniciarSesion(r) {
+  try {
+    localStorage.setItem('token-tolima', r.token);
+    localStorage.setItem('sesion-tolima', r.usuario.nombre);
+  } catch (err) {}
+  saludo(r.usuario.nombre);
+}
+function cerrarSesion() {
+  try { localStorage.removeItem('token-tolima'); localStorage.removeItem('sesion-tolima'); } catch (err) {}
+  saludo(null);
+  aviso('Cerraste tu sesión.');
+}
+// Registro conectado al backend: POST /auth/registro
+function enviarRegistro(form, rol, mensaje) {
+  form.onsubmit = async e => {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(form));
-    delete d.clave;
-    guardarRegistro(clave, d);
-    try { localStorage.setItem('sesion-tolima', d.nombre); } catch (err) {}
-    saludo(d.nombre);
-    form.reset();
-    cerrarModal();
-    aviso(mensaje);
+    const cuerpo = {
+      nombre: d.nombre, correo: d.correo, telefono: d.telefono, contrasena: d.clave,
+      rol, acepta_tratamiento_datos: d.acepta === 'on'
+    };
+    if (rol === 'productor') {
+      cuerpo.nombre_finca = d.finca;
+      cuerpo.cultivos = d.productos;
+      if (/^\d+$/.test(d.municipio)) cuerpo.id_vereda = Number(d.municipio);
+    }
+    const boton = form.querySelector('button[type=submit]');
+    boton.disabled = true;
+    try {
+      const r = await llamarAPI('/auth/registro', { method: 'POST', body: JSON.stringify(cuerpo) });
+      iniciarSesion(r);
+      form.reset();
+      cerrarModal();
+      aviso(mensaje);
+    } catch (err) {
+      aviso(err.message, 5000);
+    } finally {
+      boton.disabled = false;
+    }
   };
 }
-enviarRegistro($('#f-cliente'), 'clientes-tolima', '¡Bienvenido! Tu cuenta de cliente fue creada.');
-enviarRegistro($('#f-proveedor'), 'proveedores-tolima', '¡Gracias! Tu finca quedó registrada como proveedora.');
+enviarRegistro($('#f-cliente'), 'comprador', '¡Bienvenido! Tu cuenta de cliente fue creada.');
+enviarRegistro($('#f-proveedor'), 'productor', '¡Gracias! Tu finca quedó registrada como proveedora.');
+// Inicio de sesión conectado al backend: POST /auth/login
+$('#f-login').onsubmit = async e => {
+  e.preventDefault();
+  const d = Object.fromEntries(new FormData(e.target));
+  const boton = e.target.querySelector('button[type=submit]');
+  boton.disabled = true;
+  try {
+    const r = await llamarAPI('/auth/login', { method: 'POST', body: JSON.stringify({ usuario: d.usuario, contrasena: d.clave }) });
+    iniciarSesion(r);
+    e.target.reset();
+    cerrarModal();
+    aviso('¡Bienvenido de nuevo!');
+  } catch (err) {
+    aviso(err.message, 5000);
+  } finally {
+    boton.disabled = false;
+  }
+};
 $('#f-sus').onsubmit = e => {
   e.preventDefault();
   guardarRegistro('suscriptores-tolima', Object.fromEntries(new FormData(e.target)));
   e.target.reset();
   aviso('¡Listo! Ya estás suscrito.');
 };
-try { saludo(localStorage.getItem('sesion-tolima')); } catch (e) {}
+try { if (localStorage.getItem('token-tolima')) saludo(localStorage.getItem('sesion-tolima')); } catch (e) {}
 
 window.addEventListener('hashchange', ruta);
 
@@ -327,3 +477,6 @@ pintarInicio();
 iniciarCarrusel();
 pintarCarrito();
 ruta();
+revisarPago();
+cargarProductos();
+cargarVeredas();
