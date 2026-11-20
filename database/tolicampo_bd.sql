@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS tolicampo;
-CREATE DATABASE tolicampo
+DROP DATABASE IF EXISTS railway;
+CREATE DATABASE railway
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
-USE tolicampo;
+USE railway;
 SET NAMES utf8mb4;
 -- ---------------------------------------------------------------------
 -- 1. VEREDA (Figura 2)
