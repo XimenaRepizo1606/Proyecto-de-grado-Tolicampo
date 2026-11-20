@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToliCampo | Productos del campo tolimense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="barra container">
+    <a href="#inicio" class="logo"><img src="vegetables.png" alt="logo-tolicampo">ToliCampo</a>
+    <button class="burger" id="burger" aria-label="Abrir menú">☰</button>
+    <nav class="menu" id="menu" aria-label="Principal">
+      <a href="#inicio">Inicio</a>
+      <div class="desplegable" id="desplegable">
+        <button class="desp-btn" id="desp-btn" aria-expanded="false" aria-haspopup="true">Categorías ▾</button>
+        <div class="submenu" id="submenu"></div>
+      </div>
+    </nav>
+    <button class="icono-btn" id="btn-lupa" aria-label="Buscar productos"><img src="imagenes/lupa.svg" alt=""></button>
+    <button class="btn btn-peq" id="btn-registro">Registrarse</button>
+    <button class="btn-carrito" id="btn-carrito" aria-label="Ver carrito">
+      <img src="imagenes/shopping-cart.png" alt="">
+      <span class="contador" id="contador">0</span>
+    </button>
+  </div>
+  <form class="buscador" id="buscador" role="search" hidden>
+    <input type="search" id="q" placeholder="Busca tomate, café, fresa, Planadas…" aria-label="Buscar productos">
+    <button class="btn" type="submit">Buscar</button>
+  </form>
+
+  <div class="carrito" id="carrito" hidden>
+    <h3>Tu carrito</h3>
+    <p class="vacio" id="carrito-vacio">Aún no has agregado productos. Elige uno de los catálogos.</p>
+    <div class="tabla-scroll">
+      <table id="lista-carrito">
+        <thead><tr><th>Imagen</th><th>Producto</th><th>Cantidad</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="carrito-pie">
+      <strong>Total: <span id="total">$0</span></strong>
+      <div>
+        <button class="btn btn-claro" id="vaciar-carrito">Vaciar</button>
+        <button class="btn" id="pagar">Finalizar compra</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ===== PÁGINA DE INICIO ===== -->
+  <div id="vista-inicio">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-txt">
+          <h1>Cosechado hoy en el Tolima. En tu mesa mañana.</h1>
+          <p>Frutas, verduras, granos y carnes de fincas de Ibagué, Chaparral, Líbano, Planadas y más municipios, sin intermediarios.</p>
+          <div class="acciones">
+            <a href="#verduras" class="btn">Comprar ahora</a>
+            <a href="#pulpas" class="btn btn-claro">Ver pulpas de fruta</a>
+          </div>
+        </div>
+        <div class="hero-img">
+          <img src="imagenes/banner.jpg" alt="Puesto de verduras frescas del Tolima">
+          <span class="sello">Directo<br>del campo</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="container seccion">
+      <h2>Lo mejor de nuestras fincas</h2>
+      <div class="carrusel" id="carrusel">
+        <div class="pistas" id="pistas"></div>
+        <button class="flecha izq" id="prev" aria-label="Anterior">‹</button>
+        <button class="flecha der" id="next" aria-label="Siguiente">›</button>
+        <div class="puntos" id="puntos"></div>
+      </div>
+    </section>
+
+    <section class="container seccion">
+      <h2>Explora los catálogos</h2>
+      <div class="rejilla" id="categorias"></div>
+    </section>
+
+    <section class="franja">
+      <div class="container seccion">
+        <h2>Ofertas de la semana</h2>
+        <div class="rejilla" id="ofertas"></div>
+      </div>
+    </section>
+
+    <section class="container seccion">
+      <h2>Lo que dicen nuestros clientes</h2>
+      <div class="rejilla" id="resenas"></div>
+    </section>
+    <section class="suscripcion">
+      <div class="container sus-grid">
+        <div>
+          <h2>Suscríbete y recibe lo fresco primero</h2>
+          <p>Ofertas de la semana y tu canasta de productos del Tolima directo a tu correo.</p>
+        </div>
+        <form class="sus-form" id="f-sus">
+          <input type="text" name="nombre" placeholder="Tu nombre" required aria-label="Tu nombre">
+          <input type="email" name="correo" placeholder="Tu correo electrónico" required aria-label="Correo">
+          <select name="plan" aria-label="Tipo de suscripción">
+            <option>Ofertas semanales por correo</option>
+            <option>Canasta campesina semanal</option>
+            <option>Canasta campesina quincenal</option>
+          </select>
+          <button class="btn btn-amarillo" type="submit">Suscribirme</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== SUBPÁGINA DE CATÁLOGO ===== -->
+  <div id="vista-catalogo" hidden>
+    <section class="cab-catalogo">
+      <div class="container">
+        <h1 id="cat-titulo"></h1>
+        <p id="cat-desc"></p>
+      </div>
+    </section>
+    <section class="container seccion">
+      <div class="rejilla" id="productos"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="container pie-grid">
+    <div>
+      <h3>🌿 Tolima Fresco</h3>
+      <p>Comercializamos productos agrícolas frescos de pequeños productores del departamento del Tolima.</p>
+    </div>
+    <div>
+      <h3>Contacto</h3>
+      <p>Carrera 5 # 38-20, Ibagué, Tolima</p>
+      <p>WhatsApp: +57 300 123 4567</p>
+      <p>pedidos@tolimafresco.co</p>
+    </div>
+    <div>
+      <h3>Horario</h3>
+      <p>Lunes a sábado: 7:00 a. m. – 6:00 p. m.</p>
+      <p>Domingos: 8:00 a. m. – 1:00 p. m.</p>
+    </div>
+  </div>
+  <p class="derechos">© 2026 Tolima Fresco. Información de contacto ficticia.</p>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-tit">
+    <button class="cerrar" id="cerrar-modal" aria-label="Cerrar">✕</button>
+    <h2 id="modal-tit">Crea tu cuenta</h2>
+    <div class="pestanas">
+      <button type="button" class="on" data-tab="cliente">Soy cliente</button>
+      <button type="button" data-tab="proveedor">Soy campesino o proveedor</button>
+    </div>
+    <form class="formulario" id="f-cliente">
+      <label>Nombre completo<input name="nombre" required></label>
+      <div class="fila">
+        <label>Correo<input type="email" name="correo" required></label>
+        <label>Celular<input type="tel" name="telefono" required></label>
+      </div>
+      <label>Dirección de entrega<input name="direccion" required></label>
+      <label>Contraseña<input type="password" name="clave" minlength="6" required></label>
+      <button class="btn" type="submit">Crear cuenta de cliente</button>
+    </form>
+    <form class="formulario" id="f-proveedor" hidden>
+      <div class="fila">
+        <label>Nombre del campesino<input name="nombre" required></label>
+        <label>Nombre de la finca<input name="finca" required></label>
+      </div>
+      <div class="fila">
+        <label>Municipio<select name="municipio" id="p-mun" required></select></label>
+        <label>Celular<input type="tel" name="telefono" required></label>
+      </div>
+      <label>Productos que cultivas o produces<input name="productos" placeholder="Ej.: tomate, café, queso" required></label>
+      <div class="fila">
+        <label>Correo<input type="email" name="correo" required></label>
+        <label>Contraseña<input type="password" name="clave" minlength="6" required></label>
+      </div>
+      <button class="btn" type="submit">Registrar mi finca</button>
+    </form>
+  </div>
+</div>
+
+<div class="aviso" id="aviso" role="status"></div>
+<script src="script.js"></script>
+</body>
+</html>

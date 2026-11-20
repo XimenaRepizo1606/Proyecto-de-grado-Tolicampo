@@ -1,0 +1,47 @@
+FOTOS DE PRODUCTOS - ToliCampo
+
+Guarda aquí una foto (formato .jpg) por producto con el nombre EXACTO de la lista.
+La página la muestra sola; si la foto no está, sigue usando el recorte actual.
+Usa fotos propias o de bancos gratuitos (Pexels, Unsplash, Pixabay) y anota la fuente.
+Recomendado: 800 x 600 px y menos de 200 KB.
+
+Zanahoria -> zanahoria.jpg
+Papa pastusa -> papa-pastusa.jpg
+Pepino cohombro -> pepino-cohombro.jpg
+Berenjena -> berenjena.jpg
+Pimentón rojo -> pimenton-rojo.jpg
+Coliflor -> coliflor.jpg
+Brócoli -> brocoli.jpg
+Cilantro fresco -> cilantro-fresco.jpg
+Cebolla larga -> cebolla-larga.jpg
+Habichuela -> habichuela.jpg
+Ají picante -> aji-picante.jpg
+Fríjol cargamanto rojo -> frijol-cargamanto-rojo.jpg
+Fríjol negro -> frijol-negro.jpg
+Lenteja -> lenteja.jpg
+Lenteja roja -> lenteja-roja.jpg
+Garbanzo -> garbanzo.jpg
+Maíz tierno (mazorca) -> maiz-tierno-mazorca.jpg
+Limón Tahití -> limon-tahiti.jpg
+Manzana verde -> manzana-verde.jpg
+Tomate cherry -> tomate-cherry.jpg
+Pollo campesino entero -> pollo-campesino-entero.jpg
+Pechuga de pollo -> pechuga-de-pollo.jpg
+Costilla de cerdo -> costilla-de-cerdo.jpg
+Carne de res para guisar -> carne-de-res-para-guisar.jpg
+Chorizo artesanal -> chorizo-artesanal.jpg
+Carne molida para hamburguesa -> carne-molida-para-hamburguesa.jpg
+Leche fresca (litro) -> leche-fresca-litro.jpg
+Queso campesino -> queso-campesino.jpg
+Mantequilla artesanal -> mantequilla-artesanal.jpg
+Huevos criollos (kilo) -> huevos-criollos-kilo.jpg
+Pulpa de fresa -> pulpa-de-fresa.jpg
+Pulpa de lulo -> pulpa-de-lulo.jpg
+Pulpa de tomate de árbol -> pulpa-de-tomate-de-arbol.jpg
+Pulpa de mango -> pulpa-de-mango.jpg
+Pulpa de maracuyá -> pulpa-de-maracuya.jpg
+Plátano hartón -> platano-harton.jpg
+Papa criolla -> papa-criolla.jpg
+Aguacate papelillo -> aguacate-papelillo.jpg
+Mora de Castilla -> mora-de-castilla.jpg
+Lulo -> lulo.jpg
