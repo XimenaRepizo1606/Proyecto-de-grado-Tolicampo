@@ -5,9 +5,15 @@ const { CARPETA } = require('./config/subidas');
 const { noEncontrado, manejadorErrores } = require('./middlewares/errores');
 
 const app = express();
+// En Railway y otros servicios en la nube las peticiones llegan a través de un proxy.
+// Con esto Express toma la IP real del usuario, y el límite de intentos de login se aplica por persona.
+app.set('trust proxy', 1);
 // Permite que el frontend (otro dominio) muestre las fotos de /uploads
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: (process.env.CORS_ORIGIN || '*').split(',') }));
+// CORS_ORIGIN: '*' (cualquier origen, solo para desarrollo) o una lista separada por comas con las direcciones del frontend.
+// Se quitan espacios y la barra final para evitar errores al copiar la dirección.
+const origenes = (process.env.CORS_ORIGIN || '*').split(',').map((o) => o.trim().replace(/\/+$/, '')).filter(Boolean);
+app.use(cors({ origin: origenes.includes('*') ? '*' : origenes }));
 app.use(express.json({ limit: '100kb' }));
 
 app.use('/uploads', express.static(CARPETA, { maxAge: '7d' }));
