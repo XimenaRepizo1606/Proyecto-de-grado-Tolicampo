@@ -1,5 +1,7 @@
 // Cliente de la API REST de ToliCampo. La dirección sale de la variable VITE_API_URL.
-export const API = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
+// En la versión publicada, si Vercel no tiene la variable, se usa la API de Railway
+const API_RAILWAY = 'https://proyecto-de-grado-tolicampo-production.up.railway.app/api';
+export const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? API_RAILWAY : 'http://localhost:3000/api')).trim().replace(/\/$/, '');
 const ORIGEN_API = API.replace(/\/api$/, '');
 
 let token = null;
