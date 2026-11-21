@@ -20,19 +20,27 @@ const IMAGEN_CATEGORIA = {
   'Pulpas de fruta': '/imagenes/pulpas_de_frutas.jpg',
 };
 export const imagenCategoria = (cat) => IMAGEN_CATEGORIA[cat] || '/imagenes/banner.jpg';
-export const fotoProducto = (p) => urlFoto(p.foto_url) || imagenCategoria(p.categoria);
 
-export const DESCRIPCION_CATEGORIA = {
-  Verduras: 'Colores y sabores de la huerta tolimense',
-  Hortalizas: 'Cebolla, cilantro y más, recién cortados',
-  Granos: 'Fríjol, lenteja y maíz de las fincas del sur del Tolima',
-  Frutas: 'Dulces, jugosas y recién cosechadas',
-  'Cárnicos': 'Res, cerdo y pollo de fincas aliadas',
-  'Lácteos, quesos y huevos': 'Leche, quesos y huevos de finca',
-  'Pulpas de fruta': 'Jugos naturales listos en segundos',
+// Fotos de referencia que sí corresponden al producto (se buscan por el nombre)
+const IMAGEN_POR_NOMBRE = [
+  [/pulpa/i, '/imagenes/pulpas_de_frutas.jpg'],
+  [/tomate/i, '/imagenes/tomate.jpg'],
+  [/fresa/i, '/imagenes/fresas.jpg'],
+  [/lenteja|fr[ií]jol|arveja|garbanzo/i, '/imagenes/legumbres.jpg'],
+  [/cebolla (roja|cabezona)/i, '/imagenes/cebolla_roja.jpg'],
+  [/leche|queso|cuajada|huevo/i, '/imagenes/leche.jpg'],
+  [/carne|res\b|cerdo|pollo/i, '/imagenes/carnes.jpg'],
+];
+
+// Imagen neutra con el nombre del producto, para no mostrar la foto de otro alimento
+const COLOR_CATEGORIA = {
+  Verduras: '#2e7d3f', Hortalizas: '#4f8a2e', Granos: '#8a6a2e', Frutas: '#c94f0a',
+  'Cárnicos': '#8a2e2e', 'Lácteos, quesos y huevos': '#5a6a5d', 'Pulpas de fruta': '#d9831f',
 };
-
-export const UNIDADES = ['kilo', 'libra', 'arroba', 'bulto'];
-
-// Evita "Finca Finca de ejemplo" cuando el nombre ya empieza por "Finca"
-export const finca = (n) => (/^finca\b/i.test(n || '') ? n : `Finca ${n}`);
+const escapar = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function imagenSinFoto(p) {
+  const color = COLOR_CATEGORIA[p.categoria] || '#14472a';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#c2d99e"/>` +
+    `<circle cx="200" cy="118" r="52" fill="${color}"/>` +
+    `<path d="M200 150c0-38 20-62 52-70-4 34-22 58-52 70zm0 0c0-30-16-50-42-56 3 27 17 46 42 56z" fill="#fff"/>` +
+    `<text
