@@ -64,7 +64,7 @@ export default function Detalle() {
         <div className="relative">
           <img src={fotoProducto(p)} alt={p.nombre} className="aspect-[4/3] w-full border-2 border-verde-fondo object-cover" />
           {p.descuento_pct > 0 && <span className="absolute left-3 top-3 bg-naranja px-3 py-1 font-bold text-white">-{Math.round(p.descuento_pct)}%</span>}
-          {!p.foto_url && <p className="mt-1 text-xs text-suave">Imagen de referencia de la categoría.</p>}
+          {!p.foto_url && <p className="mt-1 text-xs text-suave">Imagen de referencia: el productor aún no ha subido una foto de este producto.</p>}
         </div>
 
         <div>
